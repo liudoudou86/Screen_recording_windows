@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding:utf-8 -*-
 # Author:lz
 
@@ -19,11 +19,11 @@ def get_desktop():
         os.mkdir('D:\@@@')
     else:
         pass
-    img = ImageGrab.grab() # 获取当前屏幕内容
     time_tup=time.localtime(time.time()) # 获取当前时间
-    format_time="%Y%m%d%H%M%S"
+    format_time="%Y-%m-%d_%H-%M-%S"
     cur_time=time.strftime(format_time,time_tup)
-    img.save('D:\@@@\桌面截图_{}.jpg'.format(cur_time)) # 保存文件的名字
+    img = ImageGrab.grab() # 获取当前屏幕内容
+    img.save('D:\@@@\Screen_{}.png'.format(cur_time)) # 保存文件的名字
     # img.show()
 
 
@@ -38,27 +38,28 @@ def get_recode():
     width = vie.size[0]
     height = vie.size[1]
     k=np.zeros((1,1),np.uint8)
-    fourcc = cv2.VideoWriter_fourcc(*'XVID') # 编码格式
     time_tup = time.localtime(time.time())
-    format_time="%Y%m%d%H%M%S"
+    format_time="%Y-%m-%d_%H-%M-%S"
     cur_time=time.strftime(format_time,time_tup)
-    video = cv2.VideoWriter('D:\@@@\屏幕录制_{}.mp4'.format(cur_time), fourcc, 30, (width,height)) # 输出文件命名,帧率为30
+    fourcc = cv2.VideoWriter_fourcc(*'X264') # 规定编码器编码视频格式
+    video = cv2.VideoWriter('D:\@@@\Record_{}.mp4'.format(cur_time), fourcc, 60, (width,height)) # 输出文件命名,帧率为30
     while True:
         im = ImageGrab.grab()
         imm = cv2.cvtColor(np.array(im), cv2.COLOR_RGB2BGR) # 转为opencv的BGR格式
         video.write(imm)
         cv2.imshow('imm', k)
-        if cv2.waitKey(1) & 0xFF == ord('a'):
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            print(ord('q'))
             break
     video.release()
     cv2.destroyAllWindows()
 
 
 layout = [
-    [sg.Button('抓屏', key = '_PHOTO_', font='微软雅黑', size=(9, 1)), sg.Button('录屏', key = '_VIDEO_', font='微软雅黑', size=(9, 1)), sg.Button('打开', key='_FOLDER_', size=(9, 1)), sg.Exit('退出', key = '_EXIT_', font='微软雅黑', size=(9, 1))]
+    [sg.Button('截图', key = '_PHOTO_', font='微软雅黑', size=(8, 3)), sg.Button('录屏', key = '_VIDEO_', font='微软雅黑', size=(8, 3)), sg.Button('打开', key='_FOLDER_', size=(8, 3)), sg.Exit('退出', key = '_EXIT_', font='微软雅黑', size=(8, 3))]
 ]
 # 定义窗口，窗口名称
-window = sg.Window('抓图录屏工具',layout,font='微软雅黑')
+window = sg.Window('截图录屏工具',layout,font='微软雅黑')
 # 自定义窗口进行数值回显
 while True:
     event,values = window.read()
