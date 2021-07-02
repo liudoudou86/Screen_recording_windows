@@ -4,6 +4,7 @@
 
 
 import os
+import threading
 import time
 import tkinter
 
@@ -12,7 +13,6 @@ import numpy as np
 import PySimpleGUI as sg
 from PIL import ImageGrab
 from pynput import keyboard
-import threading
 
 
 class mouse_screen:
@@ -42,8 +42,11 @@ class mouse_screen:
         self.win.bind('<B1-Motion>', self.Fun2)  # 绑定鼠标左键点击移动事件
         self.win.bind('<Escape>', lambda e: self.win.destroy())  # 绑定Esc按键退出事件
 
+        self.win.mainloop()  # 窗口持久化
+
     def Fun1(self, event):
-        # print(f"鼠标左键点击了一次坐标是:x={g_scale * event.x}, y={g_scale * event.y}")
+
+        # print(f"鼠标左键点击了一次坐标是:x={self.scale * self.start_x}, y={self.scale * event.y}")
         if event.state == 8:  # 鼠标左键按下
             self.start_x, self.start_y = event.x, event.y
         elif event.state == 264:  # 鼠标左键释放
@@ -60,11 +63,12 @@ class mouse_screen:
             self.win.destroy()
 
     def Fun2(self, event):
-        # print(f"鼠标左键点击了一次坐标是:x={self.__scale * event.x}, y={self.__scale * event.y}")
+
+        # print(f"鼠标左键点击了两次坐标是:x={self.scale * event.x}, y={self.scale * event.y}")
         if event.x == self.start_x or event.y == self.start_y:
             return
-        self.canvas.delete()
-        self.canvas.create_rectangle(self.start_x, self.start_y, event.x, event.y, fill='white', outline='red')
+        self.canvas.delete("area")
+        self.canvas.create_rectangle(self.start_x, self.start_y, event.x, event.y, fill='white', outline='red', tag="area")
         # 包装画布
         self.canvas.pack()
 
@@ -99,12 +103,12 @@ def get_recode():
     format_time="%Y-%m-%d_%H-%M-%S"
     cur_time=time.strftime(format_time,time_tup)
     fourcc = cv2.VideoWriter_fourcc(*'XVID') # 规定编码器编码视频格式
-    video = cv2.VideoWriter('D:\@@@\Record_{}.avi'.format(cur_time), fourcc, 60, (width,height)) # 输出文件命名,帧率为30
+    video = cv2.VideoWriter('D:\@@@\Record_{}.avi'.format(cur_time), fourcc, 10, (width,height), True) # 输出文件命名,帧率为30
     while True:
         im = ImageGrab.grab()
         imm = cv2.cvtColor(np.array(im), cv2.COLOR_RGB2BGR) # 转为opencv的BGR格式
         video.write(imm)
-        if flag:
+        if flag & cv2.waitKey(33):
             break
     video.release()
 
@@ -113,7 +117,7 @@ def on_press(key):
 
     global flag
     if key == keyboard.Key.esc:
-        flag=True
+        flag = True
         return False  #返回False，键盘监听结束！
 
 
@@ -126,7 +130,7 @@ window = sg.Window('截图录屏工具',layout,font='微软雅黑')
 while True:
     event,values = window.read()
     if event == '_MOUSE_':
-        mouse_screen()
+        area = mouse_screen()
     elif event == '_PHOTO_':
         window.disappear() # 隐藏窗口
         get_desktop()
