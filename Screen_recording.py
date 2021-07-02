@@ -108,7 +108,7 @@ def get_recode():
         im = ImageGrab.grab()
         imm = cv2.cvtColor(np.array(im), cv2.COLOR_RGB2BGR) # 转为opencv的BGR格式
         video.write(imm)
-        if flag & cv2.waitKey(33):
+        if flag:
             break
     video.release()
 
@@ -122,7 +122,8 @@ def on_press(key):
 
 
 layout = [
-    [sg.Button('区域截图', key = '_MOUSE_', font='微软雅黑', size=(8, 3)), sg.Button('全屏截图', key = '_PHOTO_', font='微软雅黑', size=(8, 3)), sg.Button('录屏', key = '_VIDEO_', font='微软雅黑', size=(8, 3)), sg.Button('打开', key='_FOLDER_', size=(8, 3)), sg.Exit('退出', key = '_EXIT_', font='微软雅黑', size=(8, 3))]
+    [sg.Button('区域截图', key = '_MOUSE_', font='微软雅黑', size=(8, 3)), sg.Button('全屏截图', key = '_PHOTO_', font='微软雅黑', size=(8, 3)), sg.Button('录屏', key = '_VIDEO_', font='微软雅黑', size=(8, 3)), sg.Button('打开', key='_FOLDER_', size=(8, 3)), sg.Exit('退出', key = '_EXIT_', font='微软雅黑', size=(8, 3))],
+    [sg.Text('请输入时间(单位:分钟)',font='微软雅黑',size=(16, 1)),sg.Input(key='_TIME_', size=(23, 1)),sg.Button('定时截图', key = '_TIMER_', font='微软雅黑', size=(8, 1))]
 ]
 # 定义窗口，窗口名称
 window = sg.Window('截图录屏工具',layout,font='微软雅黑')
@@ -142,6 +143,13 @@ while True:
             listener.join()
     elif event == '_FOLDER_':
         os.startfile(r"D:\@@@")
+    elif event == '_TIMER_':
+        timing = int(values['_TIME_'])
+        while True:
+            window.disappear()
+            get_desktop()
+            window.reappear()
+            time.sleep(timing*60)
     elif event in ['_EXIT_',None]:
         break
     else:
