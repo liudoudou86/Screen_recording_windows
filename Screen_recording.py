@@ -12,6 +12,7 @@ import numpy as np
 import PySimpleGUI as sg
 from PIL import ImageGrab
 from pynput import keyboard
+# pynput库存在问题需要导入早期版本 --- pip install pynput==1.6.8
 
 
 def system_time():
